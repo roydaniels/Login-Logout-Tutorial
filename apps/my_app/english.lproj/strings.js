@@ -10,15 +10,19 @@
 // localized string added to this file!
 //
 SC.stringsFor('English', {
+  '_Cancel':'Cancel',
   '_InvalidCredentials':'Invalid username or password. Try admin/admin',
   '_Login':'Login',
   '_LoginNameHint':'Login Name',
+  '_NewUserButton':'Register Here!',
   '_Password':'Password',
   '_PasswordHint':'Password',
   '_PasswordRequired':'Password is required',
+  '_RegisterTitle': 'Register New User',
   '_RememberMe':'Remember Me',
   '_Username':'Username',
   '_UsernameRequired':'Username is required',
   '_ServerResponseError':'Error from the server response.',
   '_SignIn':'Sign In',
+  '_SignUp':'Sign Up',
 }) ;

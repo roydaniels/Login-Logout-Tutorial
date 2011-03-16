@@ -13,9 +13,9 @@
 MyApp.loginController = SC.ObjectController.create(
 /** @scope MyApp.loginController.prototype */ {
 
-  username: '',
-  password: '',
-  rememberMe: '',
+  username: null,
+  password: null,
+  rememberMe: null,
   errorMessage: '',
   isLoggingIn: NO,
   
@@ -28,6 +28,11 @@ MyApp.loginController = SC.ObjectController.create(
   },
   
   closePanel: function() {
+    // Reset properties
+    this.set('username', null);
+    this.set('password', null);
+    this.set('errorMessage', '');
+    
     var panel = MyApp.getPath('loginPage.panel');
     if(panel) {
       panel.remove();
@@ -57,19 +62,21 @@ MyApp.loginController = SC.ObjectController.create(
       // If we have both a username and password, tell the controller we're going to start the login process by setting this flag
       this.set('isLoggingIn', YES);
 
-      // Simulate a HTTP call to check our data.
-      // If the credentials not admin/admin, then get a bad url so we get 404 error
+      // We know the username and password are not null at this point, so attempt to login
+      var hashedPassword  = MyApp.hashPassword(password);
+      var sendHash        = {};
       
-      // TODO: Add a call to an actual service here... Can anyone say Login/Logout Example App Part 2!?!
-      var url = '/';
-      if (username != 'admin' || password != 'admin') {
-        throw SC.Error.desc('_InvalidCredentials'.loc());
-      }
-
-      SC.Request.getUrl(url)
-        .notify(this, 'endLogin')
-        .send();
-
+      sendHash.user = username;
+      sendHash.pwd  = hashedPassword;
+      
+      MyApp.REQUEST_POST.set('address', '/login');
+      MyApp.REQUEST_POST.notify(this, 'endLogin').send(sendHash);
+        
+      // Clear the username and password
+      this.set('username', null);
+      this.set('password', null);
+      this.set('errorMessage', '')
+      
       return YES;
     }
     catch (e) { // If there was an error, catch and handle it
@@ -103,14 +110,14 @@ MyApp.loginController = SC.ObjectController.create(
       SC.Logger.info('HTTP status code: ' + response.status);
       if (!SC.ok(response)) {
         // Error
-        throw SC.Error.desc('_ServerResponseError'.loc());
+        throw SC.Error.desc(response.getPath('rawRequest.responseText'));
       }
 
       // Set cookie
       var rememberMe = this.get('rememberMe');
       var authCookie = SC.Cookie.create();
       authCookie.set('name', MyApp.AUTH_COOKIE_NAME);
-      authCookie.set('value', 'the token passed back in the response');
+      authCookie.set('value', response.get('body').content);
       
       if (rememberMe == '3seconds') {
         // Cookie is saved for 3 seconds
@@ -135,10 +142,13 @@ MyApp.loginController = SC.ObjectController.create(
       MyApp.statechart.sendEvent('authenticationSucceeded');
     }
     catch (e) {
+      // Authentication was not sucessful!
       this.set('errorMessage', e.message);
       SC.Logger.info('Error in endLogin: ' + e.message);
+      
+      MyApp.statechart.sendEvent('authenticationFailed');
     }
-  }
+  },
 
 }) ;
 

@@ -11,10 +11,10 @@ MyApp.loginPage = SC.Page.design({
   
     defaultResponder: 'MyApp.statechart',
 
-    layout: { width: 360, height: 160, centerX: 0, centerY: 0 },
+    layout: { width: 360, height: 201, centerX: 0, centerY: 0 },
     classNames: ['login-pane'],
     contentView: SC.View.design({
-      childViews: 'username password rememberMe loginButton loadingImage errorMessage'.w(),
+      childViews: 'username password rememberMe loginButton newUserButton errorMessage'.w(),
 
       username: SC.View.design({
         layout: { left: 17, right: 14, top: 17, height: 26 },
@@ -88,7 +88,7 @@ MyApp.loginPage = SC.Page.design({
       }),
 
       loginButton: SC.ButtonView.design({
-        layout: { height: 24, width: 80, bottom: 17, right: 17 },
+        layout: { height: 24, width: 80, bottom: 51, right: 17 },
         title: '_Login'.loc() + '...',
         isDefault: YES,
         isEnabledBinding: SC.Binding.from("MyApp.loginController.isLoggingIn").bool().not(),
@@ -96,12 +96,15 @@ MyApp.loginPage = SC.Page.design({
         action: 'signin'
       }),
 
-      loadingImage: SC.ImageView.design({
-        layout: { width: 16, height: 16, bottom: 20, right: 110 },
-        value: sc_static('images/loading'),
-        useImageQueue: NO,
-        isVisibleBinding: 'MyApp.loginController.isLoggingIn'
+      newUserButton: SC.ButtonView.design({
+        layout: { height: 24, width: 110, bottom: 17, right: 17 },
+        title: '_NewUserButton'.loc(),
+        isDefault: NO,
+        isEnabledBinding: SC.Binding.from("MyApp.loginController.isLoggingIn").bool().not(),
+
+        action: 'signup'
       }),
+      
 
       errorMessage: SC.LabelView.design({
         layout: { height: 40, width: 230, right: 120, bottom: 7 },
