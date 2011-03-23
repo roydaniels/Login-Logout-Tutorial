@@ -18,6 +18,7 @@ MyApp.loginController = SC.ObjectController.create(
   rememberMe: null,
   errorMessage: '',
   isLoggingIn: NO,
+  isAuthenticated: NO,
   
   openPanel: function() {
     var panel = MyApp.getPath('loginPage.panel');
@@ -138,6 +139,8 @@ MyApp.loginController = SC.ObjectController.create(
       this.set('errorMessage', '');
 
       // Authentication was sucessful!
+      this.set('isAuthenticated', YES);
+      
       // Send the event authenticationSucceeded to our statechart
       MyApp.statechart.sendEvent('authenticationSucceeded');
     }
@@ -149,6 +152,22 @@ MyApp.loginController = SC.ObjectController.create(
       MyApp.statechart.sendEvent('authenticationFailed');
     }
   },
+  
+  trySigninWithCookie: function() {
+    var authCookie = SC.Cookie.find(MyApp.AUTH_COOKIE_NAME);
+    if(authCookie) {
+      // Guess the user wanted to be remembered...
+      this.set('rememberMe', 'yes');
+      // Send an async call to login passing the authentication token to the server
+      var sendHash = {};
+      sendHash.pwd = authCookie.value;
+      
+      MyApp.REQUEST_POST.set('address', '/login');
+      MyApp.REQUEST_POST.notify(this, 'endLogin').send(sendHash);
+      
+      return YES;
+     } else return NO;
+   },
 
 }) ;
 

@@ -32,7 +32,7 @@ MyApp.LoggedOutState = SC.State.extend({
 
     authenticationSucceeded: function() {
       MyApp.loginController.closePanel();
-      MyApp.statechart.gotoState('loggedIn');
+      if(SC.Module.isModuleReady('logged_in')) MyApp.statechart.gotoState('loggedIn');
     },
           
     authenticationFailed: function() {

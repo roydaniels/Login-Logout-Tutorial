@@ -4,7 +4,10 @@
 # ===========================================================================
 
 # Add initial buildfile information here
-config :all, :required => [:sproutcore, "sproutcore/statechart", 'sproutcore/ace']
+
+config :my_app,
+  :required => [:sproutcore, "sproutcore/statechart", 'sproutcore/ace'],
+  :deferred_modules   => ['logged_in']   
 
 proxy "/login", :to => "localhost:6789"
 proxy "/register", :to => "localhost:6789"
